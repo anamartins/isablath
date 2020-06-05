@@ -1,9 +1,13 @@
 import express from "express";
 import mongoose from "mongoose";
 import Villager from "./db/schemas/villager.mjs";
+import cors from "cors";
+import axios from "axios";
 
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 mongoose.connect("mongodb://localhost/isablat", { useNewUrlParser: true });
 var db = mongoose.connection;
@@ -57,6 +61,36 @@ app.get("/villagers/:name", (req, res) => {
     (err, villager) => {
       if (err) return console.error(err);
       res.send(villager);
+    }
+  );
+});
+
+const HASHTAGS = "%23AnimalCrossing %23ACNH %23NintendoSwitch";
+
+app.get("/tweets/:name", (req, res) => {
+  const name = req.params.name;
+  Villager.findOne(
+    {
+      name: capitalize(name),
+    },
+    (err, villager) => {
+      if (err) return console.error(err);
+      axios
+        .get(
+          `https://api.twitter.com/1.1/search/tweets.json?max_id=${req.query.max_id}&q=${name} ${HASHTAGS}`,
+          {
+            headers: {
+              authorization: process.env.TWITTER_AUTH,
+            },
+          }
+        )
+        .then((resAxios) => {
+          res.json({
+            tweets: resAxios.data.statuses,
+            villager,
+            next_results: resAxios.data.search_metadata.next_results,
+          });
+        });
     }
   );
 });

@@ -6,10 +6,14 @@ const villagerSchema = new mongoose.Schema({
   gender: String,
   personality: String,
   birthday: String,
-  birthdayDay: String,
-  birthdayMonth: String,
+  birthdayDay: Number,
+  birthdayMonth: Number,
+  sunSign: String,
   catchphrase: String,
   icon: String,
+  iconSource: Object,
+  photo: String,
+  photoSource: Object,
 });
 
 const Villager = mongoose.model("Villager", villagerSchema);
