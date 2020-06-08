@@ -7,7 +7,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r dotenv/config ./src/app.js",
-    "start": "node -r dotenv/config ./src/app.js"
+    "start": "node -r dotenv/config ./src/app.js",
+    "pm2:start": "pm2 start --name api npm -- start",
+    "pm2:stop": "pm2 stop api",
+    "pm2:list": "pm2 list"
   },
   "author": "Ana Martins",
   "license": "ISC",
@@ -20,6 +23,7 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.3",
+    "pm2": "^4.4.0",
     "prettier": "2.0.5"
   }
 }
