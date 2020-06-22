@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const villagerSchema = new mongoose.Schema({
   name: String,
+  slug: String,
   species: String,
   gender: String,
   personality: String,

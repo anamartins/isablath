@@ -53,10 +53,11 @@ app.get("/villagers", (req, res) => {
   }
 });
 
-app.get("/villagers/:name", (req, res) => {
+app.get("/villagers/:slug", (req, res) => {
   Villager.findOne(
     {
-      name: capitalize(req.params.name),
+      // name: capitalize(req.params.name),
+      slug: req.params.slug,
     },
     (err, villager) => {
       if (err) return console.error(err);
@@ -67,17 +68,21 @@ app.get("/villagers/:name", (req, res) => {
 
 const HASHTAGS = "%23AnimalCrossing %23ACNH %23NintendoSwitch";
 
-app.get("/tweets/:name", (req, res) => {
-  const name = req.params.name;
+app.get("/tweets/:slug", (req, res) => {
+  const slug = req.params.slug;
   Villager.findOne(
     {
-      name: capitalize(name),
+      // name: capitalize(name),
+      slug: req.params.slug,
     },
     (err, villager) => {
+      console.log("vil", villager);
       if (err) return console.error(err);
       axios
         .get(
-          `https://api.twitter.com/1.1/search/tweets.json?max_id=${req.query.max_id}&q=${name} ${HASHTAGS}`,
+          `https://api.twitter.com/1.1/search/tweets.json?max_id=${
+            req.query.max_id
+          }&q=${encodeURI(villager.name)} ${HASHTAGS}`,
           {
             headers: {
               authorization: process.env.TWITTER_AUTH,

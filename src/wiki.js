@@ -14,4 +14,3 @@ let result = Array.from(list).map((item, index) => {
   }
   return null;
 });
-console.log(JSON.stringify(result));
