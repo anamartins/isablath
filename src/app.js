@@ -41,15 +41,19 @@ function getQuery(query) {
 
 app.get("/villagers", (req, res) => {
   if (Object.keys(req.query).length > 0) {
-    Villager.find(getQuery(req.query), (err, villagers) => {
-      if (err) return console.error(err);
-      res.send(villagers);
-    });
+    Villager.find(getQuery(req.query))
+      .sort("name")
+      .exec((err, villagers) => {
+        if (err) return console.error(err);
+        res.send(villagers);
+      });
   } else {
-    Villager.find((err, villagers) => {
-      if (err) return console.error(err);
-      res.send(villagers);
-    });
+    Villager.find({})
+      .sort("name")
+      .exec((err, villagers) => {
+        if (err) return console.error(err);
+        res.send(villagers);
+      });
   }
 });
 
