@@ -15,6 +15,7 @@ const villagerSchema = new mongoose.Schema({
   iconSource: Object,
   photo: String,
   photoSource: Object,
+  poster: String,
 });
 
 const Villager = mongoose.model("Villager", villagerSchema);

@@ -13,7 +13,7 @@ mongoose.connect("mongodb://localhost/isablat", { useNewUrlParser: true });
 var db = mongoose.connection;
 db.on(
   "error",
-  console.error.bind(console, "my fathers, there's a connection error:")
+  console.error.bind(console, "my feathers, there's a connection error:")
 );
 db.once("open", function () {
   console.log("yes, yes, we're connected.");
@@ -60,7 +60,6 @@ app.get("/villagers", (req, res) => {
 app.get("/villagers/:slug", (req, res) => {
   Villager.findOne(
     {
-      // name: capitalize(req.params.name),
       slug: req.params.slug,
     },
     (err, villager) => {
@@ -72,34 +71,87 @@ app.get("/villagers/:slug", (req, res) => {
 
 const HASHTAGS = "%23AnimalCrossing %23ACNH %23NintendoSwitch";
 
+function getTweets(villager, maxId) {
+  // while (tweetsResponse.length === 0 && next_resultsResponse !== null) {
+  return axios
+    .get(
+      `https://api.twitter.com/1.1/search/tweets.json?max_id=${maxId}&q=${encodeURI(
+        villager
+      )} ${HASHTAGS} -filter:retweets`,
+      {
+        headers: {
+          authorization: process.env.TWITTER_AUTH,
+        },
+      }
+    )
+    .then((resAxios) => {
+      let tweets = resAxios.data.statuses.filter((item) =>
+        item.text.includes(villager)
+      );
+      let nextResults = resAxios.data.search_metadata.next_results;
+      return { tweets, nextResults };
+    });
+  // }
+}
+
 app.get("/tweets/:slug", (req, res) => {
-  const slug = req.params.slug;
   Villager.findOne(
     {
-      // name: capitalize(name),
       slug: req.params.slug,
     },
-    (err, villager) => {
-      console.log("vil", villager);
+    async (err, villager) => {
       if (err) return console.error(err);
-      axios
-        .get(
-          `https://api.twitter.com/1.1/search/tweets.json?max_id=${
-            req.query.max_id
-          }&q=${encodeURI(villager.name)} ${HASHTAGS}`,
-          {
-            headers: {
-              authorization: process.env.TWITTER_AUTH,
-            },
-          }
-        )
-        .then((resAxios) => {
-          res.json({
-            tweets: resAxios.data.statuses,
-            villager,
-            next_results: resAxios.data.search_metadata.next_results,
-          });
-        });
+
+      let validResponse = false;
+      let tweets;
+      let nextResults;
+      let count = 0;
+      while (!validResponse && count < 5) {
+        const response = await getTweets(villager.name, req.query.max_id);
+        tweets = response.tweets;
+        nextResults = response.nextResults;
+        validResponse =
+          tweets.length !== 0 ||
+          nextResults === undefined ||
+          nextResults === null;
+        count++;
+      }
+
+      res.json({
+        tweets: tweets,
+        villager,
+        next_results: nextResults,
+      });
+
+      //
+      // axios
+      //   .get(
+      //     `https://api.twitter.com/1.1/search/tweets.json?max_id=${
+      //       req.query.max_id
+      //     }&q=${encodeURI(villager.name)} ${HASHTAGS} -filter:retweets`,
+      //     {
+      //       headers: {
+      //         authorization: process.env.TWITTER_AUTH,
+      //       },
+      //     }
+      //   )
+      //   .then((resAxios) => {
+      //     let tweetsResponse = resAxios.data.statuses.filter((item) =>
+      //       item.text.includes(villager.name)
+      //     );
+      //     let next_resultsResponse = resAxios.data.search_metadata.next_results;
+
+      //     if (tweetsResponse.length === 0 && next_resultsResponse !== null) {
+      //       //chama de novo!
+      //     } else {
+      //       res.json({
+      //         tweets: tweetsResponse,
+      //         villager,
+      //         next_results: next_resultsResponse,
+      //       });
+      //     }
+      //   });
+      //
     }
   );
 });
