@@ -12,10 +12,9 @@ const villagerSchema = new mongoose.Schema({
   sunSign: String,
   catchphrase: String,
   icon: String,
-  iconSource: Object,
   photo: String,
-  photoSource: Object,
   poster: String,
+  favSong: String,
 });
 
 const Villager = mongoose.model("Villager", villagerSchema);
