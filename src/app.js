@@ -4,6 +4,7 @@ import Villager from "./db/schemas/villager.mjs";
 import Fish from "./db/schemas/fish.mjs";
 import Insect from "./db/schemas/insect.mjs";
 import SeaCreature from "./db/schemas/seaCreature.mjs";
+import Music from "./db/schemas/music.mjs";
 import cors from "cors";
 import axios from "axios";
 
@@ -158,6 +159,36 @@ app.get("/sea-creatures/:slug", (req, res) => {
     (err, seaCreature) => {
       if (err) return console.error(err);
       res.send(seaCreature);
+    }
+  );
+});
+
+app.get("/music", (req, res) => {
+  if (Object.keys(req.query).length > 0) {
+    Music.find(getQuery(req.query))
+      .sort("name")
+      .exec((err, music) => {
+        if (err) return console.error(err);
+        res.send(music);
+      });
+  } else {
+    Music.find({})
+      .sort("name")
+      .exec((err, music) => {
+        if (err) return console.error(err);
+        res.send(music);
+      });
+  }
+});
+
+app.get("/music/:slug", (req, res) => {
+  Music.findOne(
+    {
+      slug: req.params.slug,
+    },
+    (err, music) => {
+      if (err) return console.error(err);
+      res.send(music);
     }
   );
 });
