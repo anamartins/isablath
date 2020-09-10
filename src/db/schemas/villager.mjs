@@ -14,6 +14,7 @@ const villagerSchema = new mongoose.Schema({
   icon: String,
   photo: String,
   poster: String,
+  favSongName: String,
   favSong: String,
 });
 

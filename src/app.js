@@ -29,23 +29,9 @@ app.listen(port, () =>
   console.log(`Example app listening at http://localhost:${port}`)
 );
 
-function capitalize(name) {
-  return name.charAt(0).toUpperCase() + name.slice(1);
-}
-
-function getQuery(query) {
-  let keys = Object.keys(query);
-  let values = Object.values(query);
-  let object = {};
-  for (let i = 0; i < keys.length; i++) {
-    object[keys[i]] = capitalize(values[i]);
-  }
-  return object;
-}
-
 app.get("/villagers", (req, res) => {
   if (Object.keys(req.query).length > 0) {
-    Villager.find(getQuery(req.query))
+    Villager.find(req.query)
       .sort("name")
       .exec((err, villagers) => {
         if (err) return console.error(err);
@@ -166,14 +152,14 @@ app.get("/sea-creatures/:slug", (req, res) => {
 app.get("/music", (req, res) => {
   if (Object.keys(req.query).length > 0) {
     Music.find(getQuery(req.query))
-      .sort("name")
+      .sort("slug")
       .exec((err, music) => {
         if (err) return console.error(err);
         res.send(music);
       });
   } else {
     Music.find({})
-      .sort("name")
+      .sort("slug")
       .exec((err, music) => {
         if (err) return console.error(err);
         res.send(music);
